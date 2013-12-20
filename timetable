@@ -1,0 +1,83 @@
+ <form action="#" method="POST" >
+    <input type="date" name="mday"><br>
+   <input type="time" name="mtime" >
+   <input type="submit">
+ </form>
+ 
+ <?php
+
+    if(!empty($_POST))
+    {
+	  $tempDate = $_POST['mday'];
+      $day=date("N", strtotime( $tempDate));
+   
+		$str= $_POST['mtime'];
+		$tih=$str[0]*10+$str[1];
+   
+		if( $tih<8 or $tih>18)
+		{ die("time out of range");}
+		
+		else
+	  {
+		$tim=$str[3]*10+$str[4];
+    
+		$time=($tih-8)*2;
+
+		if($tim>30)
+		$time+=2;
+		else
+		$time+=1;
+        checkAvail($time,$day);
+	  }
+	}
+	 
+	 function checkAvail($time,$day)
+    {
+	       // DB connection info
+		//TODO: Update the values for $host, $user, $pwd, and $db
+		//using the values you retrieved earlier from the portal.
+		$server = "tcp:r95l41wqhn.database.windows.net,1433";
+		$user = "chetank88";
+		$pwd = "COMPUTERK88@";
+		$db = "ComputerScienceDB";
+
+		// Connect to database.
+        try
+	   {  $conn = new PDO ( "sqlsrv:server = $server; Database =$db", "$user", "$pwd");   
+          $conn->setAttribute( PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION );
+       }
+     catch ( PDOException $e ) 
+     {  print( "Error connecting to SQL Server." );  die(print_r($e));}
+
+
+     echo 'Successfully connected';
+
+     $sql_select = "SELECT * FROM table1";
+     $stmt = $conn->query($sql_select);
+     $periods = $stmt->fetchAll(); 
+	 
+	 if(count($periods) > 0) 
+	 {
+	  $avail=0;
+      foreach($periods as $period)
+      {
+        if($period["Day"]==$day)
+        {
+		    $flag=0;
+            for($i=1;$i<=19;$i++)
+            {
+                if($period["Column$i"]===NULL && $i===$time)
+                 {$avail=1;echo "<br>available:$avail<br>";$flag=1;break;}
+
+            }
+			if($flag==0)
+			{
+			   $avail=0;
+			  echo "<br>available:$avail<br>";
+			}
+          break;
+        }
+      }
+     }
+    }
+ ?>
