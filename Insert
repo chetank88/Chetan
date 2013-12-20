@@ -1,0 +1,2 @@
+$sql_insert = "INSERT INTO registration_tbl (name, email, date) 
+                   VALUES (?,?,?)";
